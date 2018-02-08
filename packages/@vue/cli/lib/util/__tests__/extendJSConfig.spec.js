@@ -1,11 +1,5 @@
 const extend = require('../extendJSConfig')
 
-function assertMatch (source, expected) {
-  source = source.split(/\n\r?/g)
-  expected = expected.split(/\n\r?/g)
-  expect(source).toEqual(expected)
-}
-
 test(`basic`, () => {
   const value = {
     foo: true,
@@ -13,20 +7,9 @@ test(`basic`, () => {
       modules: true
     }
   }
-  const source =
-`module.exports = {
-  foo: false,
-  css: {
-    modules: false
-  }
-}`
-  assertMatch(extend(value, source),
-    `module.exports = {
-  foo: true,
-  css: {
-    modules: true
-  }
-}`
+  const source = `module.exports = {\n  foo: false,\n  css: {\n    modules: false\n  }\n}`
+  expect(extend(value, source)).toMatch(
+    `module.exports = {\n  foo: true,\n  css: {\n    modules: true\n  }\n}`
   )
 })
 
@@ -34,15 +17,9 @@ test(`adding new property`, () => {
   const value = {
     foo: true
   }
-  const source =
-`module.exports = {
-  bar: 123
-}`
-  assertMatch(extend(value, source),
-    `module.exports = {
-  bar: 123,
-  foo: true
-}`
+  const source = `module.exports = {\n  bar: 123\n}`
+  expect(extend(value, source)).toMatch(
+    `module.exports = {\n  bar: 123,\n  foo: true\n}`
   )
 })
 
@@ -50,16 +27,8 @@ test(`non direct assignment`, () => {
   const value = {
     foo: true
   }
-  const source =
-`const config = {
-  bar: 123
-}
-module.exports = config`
-  assertMatch(extend(value, source),
-    `const config = {
-  bar: 123,
-  foo: true
-}
-module.exports = config`
+  const source = `const config = {\n  bar: 123\n}\nmodule.exports = config`
+  expect(extend(value, source)).toMatch(
+    `const config = {\n  bar: 123,\n  foo: true\n}\nmodule.exports = config`
   )
 })
